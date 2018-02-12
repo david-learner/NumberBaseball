@@ -9,15 +9,30 @@ public class NumberBaseball {
 
 		/* 선언 및 초기화 */
 		String[] quizArr = new String[] { "0", "0", "0" }; // 컴퓨터가 생성할 임의의 수 3개가 들어갈 배열
-		String[] answerArr = new String[] { "0", "0", "0" }; // 사용자가 응답한 3자리 수가 들어갈 배열
+		String[] answerArr = new String[] { "0", "0", "0" }; // 사용자가 입력한 3자리 수가 들어갈 배열
 		int[] scoreArr = new int[] { 0, 0 }; // [0]:strike, [1]:ball
-		int strike = 0; // strike 개수
-		int ball = 0; // ball 개수
-		// int nothing = 0; // nothing 개수
+		String randomNumber = "0";
 
 		// 컴퓨터 랜덤 수 생성
-		for (int i = 0; i < 3; i++) {
-			quizArr[i] = nb.makeRandomNumber(1, 9);
+//		for (int i = 0; i < 3; i++) {
+//			// overlap체크를 통과해야 다음 넘버 생성으로 진행
+//			{
+//				randomNumber = Integer.toString(nb.makeRandomNumber(1, 9)); //임의의 숫자 생성
+//				System.out.println("생성된 랜덤 숫자 : " + randomNumber);
+//			}while (nb.isOverlap(quizArr, randomNumber, i)); //생성된 임의의 숫자가 중복인지 체크
+//			System.out.println("중복되지 않는 랜덤 숫자 : " + randomNumber);
+//		}
+		//위의 방식으로 할 때, 간헐적으로 중복발생 무한 반복 현상 보임.
+		
+		int i = 0;
+		while(i < 3) {
+			randomNumber = Integer.toString(nb.makeRandomNumber(1, 9)); //임의의 숫자 생성
+			System.out.println("생성된 랜덤 숫자 : " + randomNumber);
+			if(nb.isOverlap(quizArr, randomNumber, i)) {
+				continue;
+			}else {
+				i++;
+			}
 		}
 		System.out.println("컴퓨터 랜덤 수 : " + Arrays.toString(quizArr));
 
@@ -45,24 +60,23 @@ public class NumberBaseball {
 		// }
 
 		nb.compare(quizArr, answerArr, scoreArr);
-
-		// System.out.println("s : " + strike + " b : " + ball);
-		System.out.println("s : " + scoreArr[0] + " b : " + scoreArr[1]);
+		System.out.println(Arrays.toString(scoreArr));
+		nb.result(scoreArr);
 	}
 
 	// 컴퓨터의 랜덤 수와 사용자가 입력한 수를 비교
 	public void compare(String[] quizArr, String[] answerArr, int[] scoreArr) {
 		// findStrike(quizArr, answerArr, scoreArr);
 		for (int i = 0; i < 3; i++) {
-			if (findStrike(quizArr, answerArr, scoreArr, i)) {
+			if (isStrike(quizArr, answerArr, scoreArr, i)) {
 				continue;
 			} else {
-				findBall(quizArr, answerArr, scoreArr, i);
+				isBall(quizArr, answerArr, scoreArr, i);
 			}
 		}
 	}
 
-	public boolean findStrike(String[] quizArr, String[] answerArr, int[] scoreArr, int index) {
+	public boolean isStrike(String[] quizArr, String[] answerArr, int[] scoreArr, int index) {
 		if (quizArr[index].equals(answerArr[index])) {
 			scoreArr[0]++; // strike++;
 			return true;
@@ -71,18 +85,36 @@ public class NumberBaseball {
 		}
 	}
 
-	public void findBall(String[] quizArr, String[] answerArr, int[] scoreArr, int index) {
+	public void isBall(String[] quizArr, String[] answerArr, int[] scoreArr, int index) {
 		for (int i = 0; i < 3; i++) {
-			if (!(i == index) & quizArr[index].equals(answerArr[i])) {
-				scoreArr[1]++; //ball++;
+			if (!(i == index) && quizArr[index].equals(answerArr[i])) {
+				scoreArr[1]++; // ball++;
 			}
+		}
+	}
+
+	public void result(int[] scoreArr) {
+		if (scoreArr[0] != 0) {
+			if(scoreArr[0] == 3) {
+				System.out.println();
+			}else {
+				System.out.println(scoreArr[0] + "스트라이크");
+			}
+		}
+		
+		if (scoreArr[1] != 0) {
+			System.out.println(scoreArr[1] + "볼");
+		}
+		
+		if((scoreArr[0] == 0) && (scoreArr[1] == 0)){
+			System.out.println("낫싱");
 		}
 	}
 
 	/*
 	 * num1은 랜덤 수의 하한값, num2는 랜덤 수의 상한값. makeRandomNumber(1, 9)이면, 1~9까지의 랜덤한 수를 반환
 	 */
-	public String makeRandomNumber(int num1, int num2) {
+	public int makeRandomNumber(int num1, int num2) {
 		// int randomNumber = 0;
 		// {
 		// randomNumber = (int)(Math.random() * 10); //먼저 10을 곱하고 int로 변환. int로 먼저 변환하면
@@ -90,6 +122,24 @@ public class NumberBaseball {
 		// System.out.println(randomNumber);
 		// }while(!(randomNumber == 0 || randomNumber == 10));
 		int randomNumber = (int) (Math.random() * (num2 - num1 + 1)) + num1;
-		return Integer.toString(randomNumber);
+		return randomNumber;
+	}
+
+	public boolean isOverlap(String[] quizArr, String randomNumber, int index) {
+		System.out.println("중복발생0");
+		for (int i = 0; i < 3; i++) {
+			System.out.println("중복발생1");
+			if (!(quizArr[i].equals("0")) && (quizArr[i].equals(randomNumber))) {
+				System.out.println("중복발생2");
+				return true;
+			}
+		}
+		insert(quizArr, randomNumber, index); //중복되지 않는 숫자, quiz배열에 삽입
+		System.out.println("not중복발생");
+		return false;
+	}
+	
+	public void insert(String[] quizArr, String randomNumber, int index) {
+		quizArr[index] = randomNumber;
 	}
 }
