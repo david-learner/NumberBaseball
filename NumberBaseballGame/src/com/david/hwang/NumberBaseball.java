@@ -6,20 +6,19 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NumberBaseball {
 	/* 선언 및 초기화 */
-	int[] quizArr = { 0, 0, 0 }; //컴퓨터가 생성할 임의의 수 3개가 들어갈 배열
-	int[] answerArr = { 0, 0, 0 }; //사용자가 입력한 3자리 수가 들어갈 배열
-	int[] scoreArr = { 0, 0 }; //[0]:strike, [1]:ball
+	int[] quizArr = { 0, 0, 0 }; // 컴퓨터가 생성할 임의의 수 3개가 들어갈 배열
+	int[] answerArr = { 0, 0, 0 }; // 사용자가 입력한 3자리 수가 들어갈 배열
+	int[] scoreArr = { 0, 0 }; // [0]:strike, [1]:ball
 	int randomNumber = 0;
 
 	public static void main(String[] args) {
-		NumberBaseball nb = new NumberBaseball();  //NumberBaseball 객체 생성
-		
-		nb.insertRandomNumber(nb.quizArr, nb.randomNumber);  //컴퓨터 랜덤 수 생성
-		
+		NumberBaseball nb = new NumberBaseball(); // NumberBaseball 객체 생성
+
+		nb.insertRandomNumber(nb.quizArr, nb.randomNumber); // 컴퓨터 랜덤 수 생성
+
 		while (nb.scoreArr[0] < 3) {
-			nb.init(nb.answerArr, nb.scoreArr);  //이전 사용자
-			//nb.splitNumber(nb.inputNumber());  //입력받은 숫자를 각각 한 자리 숫자로 나누기
-			//첫 번째 매개변수가 별로(?)다. 각각의 리턴값을 변수로 만들어서 넣자니 줄이 늘어난다.
+			nb.init(nb.answerArr, nb.scoreArr); // 이전 사용자
+			// 첫 번째 매개변수가 별로(?)다. 각각의 리턴값을 변수로 만들어서 넣자니 줄이 늘어난다.
 			nb.insertNumber(nb.splitNumber(nb.inputNumber()), nb.answerArr);
 			nb.compare(nb.quizArr, nb.answerArr, nb.scoreArr);
 			nb.result(nb.scoreArr);
@@ -36,11 +35,11 @@ public class NumberBaseball {
 	public int[] splitNumber(int userInputNumber) {
 		int[] userInputNumberArr = { 0, 0, 0 };
 		userInputNumberArr[0] = userInputNumber / 100; // 백의자리
-		userInputNumberArr[1] = ( userInputNumber / 10 ) % 10 ; //십의자리
-		userInputNumberArr[2] = userInputNumber % 10; //일의자리
+		userInputNumberArr[1] = (userInputNumber / 10) % 10; // 십의자리
+		userInputNumberArr[2] = userInputNumber % 10; // 일의자리
 		return userInputNumberArr;
 	}
-	
+
 	public void insertNumber(int[] splittedNumberArr, int[] answerArr) {
 		System.arraycopy(splittedNumberArr, 0, answerArr, 0, 3);
 	}
@@ -80,12 +79,11 @@ public class NumberBaseball {
 	}
 
 	public void result(int[] scoreArr) {
-		if (scoreArr[0] != 0) {
-			if (scoreArr[0] == 3) {
-				System.out.print("3개의 숫자를 모두 맞히셨습니다! 게임 종료");
-			} else {
-				System.out.print(scoreArr[0] + "스트라이크 ");
-			}
+		//3스트라이크(정답)를 먼저 체크하고 나머지는 "n스트라이크"로 출력. 반대로 되면 정답대신 3스트라이크 출력.
+		if (scoreArr[0] == 3) {
+			System.out.print("3개의 숫자를 모두 맞히셨습니다! 게임 종료");
+		}else if (scoreArr[0] != 0) {
+			System.out.print(scoreArr[0] + "스트라이크 ");
 		}
 
 		if (scoreArr[1] != 0) {
@@ -95,7 +93,7 @@ public class NumberBaseball {
 		if ((scoreArr[0] == 0) && (scoreArr[1] == 0)) {
 			System.out.print("낫싱");
 		}
-		
+
 		System.out.println("");
 	}
 
@@ -108,14 +106,10 @@ public class NumberBaseball {
 	}
 
 	public void insertRandomNumber(int[] quizArr, int randomNumber) {
-		int i = 0;
-		while (i < 3) {
-			randomNumber = makeRandomNumber(1, 9); // 임의의 숫자 생성
-			if (isOverlap(quizArr, randomNumber, i)) {
-				continue;
-			} else {
-				i++;
-			}
+		for (int i = 0; i < 3; i++) {
+			do {
+				randomNumber = makeRandomNumber(1, 9);
+			} while (isOverlap(quizArr, randomNumber, i));
 		}
 	}
 
